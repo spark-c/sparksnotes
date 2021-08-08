@@ -32,7 +32,7 @@ After having just recently done some bugfixes, the following is my working solut
 - [Approach](#Approach)
 - [Multiplayer "Respawn" Settings](#Multiplayer-Respawn-Settings)
 - [Respawn Delay](#Respawn-Delay)
-- [Spawn/Respawn Position](#Spawn-and-Respawn-Position)
+- [Spawn/Respawn Position](#Spawn-vs-Respawn-Position)
 - [Loadouts](#Loadouts)
 - [Spectating](#Spectating)
 - [Wrap-up](#Wrap-up)
@@ -85,10 +85,12 @@ These can be found in the top bar of the Zeus editor, under the "Attributes > Mu
 First, under the "Respawn" tab, I've set the drop-down menu called "Respawn" to "Respawn on Custom Position".
 
 Then, there are four "Rulesets" boxes to be checked:
-- Select respawn position (this will have ramifications later. See [Spawn and Respawn Positions](#Spawn-and-Respawn-Positions))
-- Select respawn loadout (we will handle this in [Loadouts](#loadouts))
-- Show respawn counter
-- Subtract tickets upon respawn
+- *Select respawn position*: This is one part of the solution needed to allow players selecting respawn loadouts.
+	- This will have ramifications later. See [Spawn vs Respawn Positions](#Spawn-vs-Respawn-Positions)).
+- *Select respawn loadout* 
+	- We will handle this further in [Loadouts](#loadouts)).
+- *Show respawn counter*
+- *Subtract tickets upon respawn*: It is my preference that the respawn tickets act as a resource to be traded for a new life. It's more intuitive to me that way.
 
 
 [Table of Contents](#table-of-contents)
@@ -123,7 +125,7 @@ The use of this function is just `[side, #tickets] call BIS_fnc_respawnTickets;`
 
 ---
 ### Loadouts
-Players are given very specific loadouts as a part of the balance of this gamemode, and we need to make sure that they also *re*spawn with one of these preset loadouts; if we don't set this up specifically, then players will simply be given the default equipment defined by ARMA's config.
+Players are given very specific loadouts as a part of the balance of this gamemode, and we need to make sure that they also *re*spawn with one of these preset loadouts; if we don't set this up specifically, then players will simply be given the "Default" loadout defined by ARMA's config.
 
 To deal with this, we'll need to add our own custom Role (CfgRoles) classes and Loadout (CfgRespawnInventory) classes to this mission's description.ext file.
 
@@ -134,16 +136,78 @@ Just like the init.sqf file -- if you have not already added a "description.ext"
 
 We'll be adding the two previously-mentioned classes to the file: CfgRoles and CfgRespawnInventory.
 
-#### CfgRoles
-This one isn't too bad at all! For each role we'd like to create, we'll need just a couple of 
-TODO
+> As a refresher to help understand how "Roles" and "Loadouts" are connected: Each role may have multiple associated loadouts. For example, a Marksman role might have options for either a medium-range loadout, or a longer-range DMR loadout.
 
+*As a final disclaimer in this section, I'm not privy to any naming conventions in the ARMA sphere. There's probably a "correct" way to name these things that I'm not aware of.*
+
+#### CfgRoles
+For each role we'd like to create, we'll need just a couple of attributes; a `displayName` for the role, and an `icon` to be displayed along with it. Here's an example of some of my roles:
+```
+// in description.ext
+
+class CfgRoles
+{
+	class BluClose // Close-range loadouts for BLUFOR
+	{
+		displayName = BluforClose;
+		icon = "a3\Ui_f\data\GUI\Cfg\RespawnRoles\assault_ca.paa";
+	};
+
+	// ...
+	
+	class OpLight // Lightweight loadouts for OPFOR
+	{
+		displayName = OpforLight;
+		icon = "a3\Ui_f\data\GUI\Cfg\RespawnRoles\assault_ca.paa";
+	};
+};
+
+```
+
+I personally wasn't concerned with the icons, so I left them as the default one. I haven't found very clear instructions anywhere on how to create custom icons, so I haven't dabbled in that yet.
+
+As a reminder, the `displayName` attribute is what players will eventually see as the name of the loadout in the respawn screen.
+
+#### CfgRespawnInventory
+This config class actually defines the items/equipment that will be given to the player as part of the loadout. First, I'll show you a quick trick for setting up a soldier in the Editor how you like, and exporting that loadout as a config class!
 
 [Table of Contents](#table-of-contents)
 
 ---
-### Spawn and Respawn Positions
-This was one of the first of the more difficult problems to address. I want players to spawn on the set respawn points after they are killed, *however*, I don't want them spawning there at the very beginning of the mission. 
+### Spawn vs Respawn Positions
+This was one of the first of the more challenging problems to address. I want players to spawn on the set respawn points after they are killed, *however*, I don't want them spawning there at the very beginning of the mission.
+
+For that reason, I created two new/extra "spawn" positions with the respawn module -- one per side, located on their starting spot. I would need to have these positions enabled at the mission start, and then at some later time, disable them and enable the new *re*spawn points.
+
+To do this, I'm using the function `BIS_fnc_moduleRespawnPosition`. Unfortunately, there's basically no documentation for its use; even the Bohemia info page for this function is empty. There is the entry in the editor's Function Viewer, but it's over my head in terms of my understanding.
+
+This means that I can't offer any *details* about it... but I did get it working well enough for my purposes.
+
+To simply toggle a Respawn Module on or off, use this:
+
+`[<module-name>, nil, <activated(bool)>] BIS_fnc_moduleRespawnPosition`
+
+This means that if you have a module called "respawn_east" and want to turn it off, you run the command:
+
+`[respawn_east, nil, false] call BIS_fnc_moduleRespawnPosition`
+
+Concise! Since a lot of my work is being done within the editor where the Respawn Module is readily available, I like this approach.
+
+**Okay, back to the actual task at hand!**
+
+I already had a trigger laying around which activates the mission's main objectives after five minutes into the game. For my purposes, this is an acceptable enough place to switch the respawns; it would probably be better practice to create its own trigger and more thoughtful activation conditions, but this will do for now to show the point.
+
+In the trigger's "On Activation" body, I used the following code to disable the *original* spawnpoints:
+
+`[respawn_east_starting, nil, false] call BIS_fnc_moduleRespawnPosition; [respawn_west_starting, nil, false] call BIS_fnc_moduleRespawnPosition;`
+
+Remember, that *you cannot use line-breaks in the trigger's fields*.
+
+Now, to enable the *new* respawn points, there are two options:
+1. Use the same method of code in the trigger body, or
+2. Right-click > Sync the trigger to the respawn module to show.
+
+Either way will work! I would prefer to use code for the sake of keeping it all as uniform as possible.
 
 [Table of Contents](#table-of-contents)
 
@@ -161,6 +225,7 @@ This one was a little of a tougher one! To recap, I wanted the setup to be like 
 
 ### Spectating
 TODO
+
 [Table of Contents](#table-of-contents)
 
 ---
