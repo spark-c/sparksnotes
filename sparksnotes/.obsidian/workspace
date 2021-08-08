@@ -1,0 +1,102 @@
+{
+  "main": {
+    "id": "061387b10a59b19f",
+    "type": "split",
+    "children": [
+      {
+        "id": "55649571ad19ae0a",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "One approach to multiplayer respawns in Arma 3.md",
+            "mode": "source"
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "10d65b083734df02",
+    "type": "split",
+    "children": [
+      {
+        "id": "a7fc68aa18598e02",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "81f351f27dc0bda3",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "5a600b8909df78c3",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "411be0f4edc067d1",
+    "type": "split",
+    "children": [
+      {
+        "id": "5cb57a54240d686c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "90a525f12e8dd1cd",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "One approach to multiplayer respawns in Arma 3.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "55649571ad19ae0a",
+  "lastOpenFiles": [
+    "One approach to multiplayer respawns in Arma 3.md",
+    "Guides.md",
+    "Untitled 1.md",
+    "Ideas.md",
+    "idea/Create a Contact Form with FastAPI and EZGmail.md",
+    "Untitled.md",
+    "idea/SparksieBOT grows with me.md",
+    "Project Write-Up.md",
+    "published/a_decade_of_ballet.md",
+    "idea/getting started with heroku postgres and sqlalchemy.md"
+  ]
+}
