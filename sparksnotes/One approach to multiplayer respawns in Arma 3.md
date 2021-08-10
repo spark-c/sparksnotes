@@ -3,7 +3,7 @@
 # Brief Context
 Hiya! It's always felt to me that Arma 3, despite its robust and active modding / custom content scene, is not very well documented and often requires lots of bumbling around in 5yr old forum posts with incomplete answers in order to learn anything.
 
-Well, this is my attempt to add something of value so that someone new might have a *slightly* easier time. [Click here to skip to the main content!](#Table-of-Contents)
+Well, this is my attempt to add something of value so that someone new might have a *slightly* easier time. [Click here to skip to the main content!](#Table-of-Contents) The resulting files / scripts can be found in the very last section in their entirety, so you can see how it all fits together.
 
 **DISCLAIMER**: I am a relative noob when it comes to this stuff. I'll explain how I set my mission up, but your results may vary.
 
@@ -11,7 +11,7 @@ Further, this post **assumes some foundational knowledge**, such as:
 - Being able to open the Zeus editor / open or create a new mission file,
 - Some level of familiarity with navigating the editor and selecting / placing objects and modules,
 - Some understanding of what a Trigger is,
-- The concept of what a variable is, and not being scared to write/adapt a couple lines of code that I will provide :)
+- The concept of what a variable is, and a willingness to write/adapt some code that I will provide :)
 
 ## My custom mission/gamemode: "The Hunt"
 In short, the mission I will be breaking down here is called "the hunt", the repo for which can be found [here](https://github.com/spark-c/ARMA3-the-hunt) on my github. Full game info and rules can be found in the README.md.
@@ -36,12 +36,11 @@ After having just recently done some bugfixes, the following is my working solut
 - [Loadouts](#Loadouts)
 - [Spectating](#Spectating)
 - [Wrap-up](#Wrap-up)
+- [Full Scripts](#Full-Scripts)
 
 ## Specifications
 (Numbered list for later reference to specific points)
 1. Each side should have a set number of respawn tickets.
-    - All players on a side being eliminated with no more tickets results in game-end.
-    - If Blufor has no living players, even if there are tickets remaining, they lose anyway.
 1. Each side should have its *own* respawn delay time. Opfor has shorter delay.
 1. At mission start, players should spawn at specific starting locations. *After that*, however, any *re*-spawns should take place at the side's designated respawn position.
 1. On respawn, players should be given one of the gamemode-specific loadouts. (*NOT* the default!)
@@ -57,7 +56,7 @@ To begin, I'm using the Respawn module via Zeus editor (with tiny scripts as nee
 
 Double-click (or Right-Click > Attributes) to open up the Attributes window for this module. If this position will be used for *only* one side (as it is in my case), in the "System: Init" tab, you'll want to give this position a variable name. This is how we will refer to this point in the future.
 
-I think setting names for the respawn points is technically overkill in this case, because I'll be allowing players to manually "select" their spawnpoint (more on that later). HOWEVER, if you will not be taking players to a spawn select screen, you'll need to set a name for the point.
+I think setting names for the respawn points is *technically* overkill in my case, because I'll be allowing players to manually "select" their spawnpoint (more on that later). HOWEVER, if you will not be taking players to a spawn select screen, you'll need to set a name for the point.
 
 Arma has a special convention for these respawn point names. The name **MUST START** with the following prefix, according to the side:
 
@@ -85,12 +84,13 @@ These can be found in the top bar of the Zeus editor, under the "Attributes > Mu
 First, under the "Respawn" tab, I've set the drop-down menu called "Respawn" to "Respawn on Custom Position".
 
 Then, there are four "Rulesets" boxes to be checked:
-- *Select respawn position*: This is one part of the solution needed to allow players selecting respawn loadouts.
+- ***Select respawn position***: This is one part of the solution needed to allow players selecting respawn loadouts.
 	- This will have ramifications later. See [Spawn vs Respawn Positions](#Spawn-vs-Respawn-Positions)).
-- *Select respawn loadout* 
+- ***Select respawn loadout*** 
 	- We will handle this further in [Loadouts](#loadouts)).
-- *Show respawn counter*
-- *Subtract tickets upon respawn*: It is my preference that the respawn tickets act as a resource to be traded for a new life. It's more intuitive to me that way.
+- ***Show respawn counter***
+- ***Subtract tickets upon respawn***: It is my preference that the respawn tickets act as a resource to be traded for a new life. It's more intuitive to me that way.
+- ***Spectator***: I want dead players to spectate their teammates in 1st person, so we will need to enable this setting to allow that.
 
 
 [Table of Contents](#table-of-contents)
@@ -140,7 +140,7 @@ We'll be adding the two previously-mentioned classes to the file: CfgRoles and C
 
 *As a final disclaimer in this section, I'm not privy to any naming conventions in the ARMA sphere. There's probably a "correct" way to name these things that I'm not aware of.*
 
-#### CfgRoles
+#### ~CfgRoles~
 For each role we'd like to create, we'll need just a couple of attributes; a `displayName` for the role, and an `icon` to be displayed along with it. Here's an example of some of my roles:
 ```
 // in description.ext
@@ -168,8 +168,74 @@ I personally wasn't concerned with the icons, so I left them as the default one.
 
 As a reminder, the `displayName` attribute is what players will eventually see as the name of the loadout in the respawn screen.
 
-#### CfgRespawnInventory
-This config class actually defines the items/equipment that will be given to the player as part of the loadout. First, I'll show you a quick trick for setting up a soldier in the Editor how you like, and exporting that loadout as a config class!
+#### ~CfgRespawnInventory~
+This config class actually defines the items/equipment that will be given to the player as part of the loadout. First, I'll show you a trick for setting up a soldier in the editor how you like, and exporting that loadout as a config class!
+
+This does require the use of a mod on the Steam Workshop: [3den Enhanced](https://steamcommunity.com/sharedfiles/filedetails/?id=623475643webpage). It adds *significant* quality-of-life improvements and additional tools in the editor; if you're creating missions or using the editor, I highly recommend it.
+
+> Be sure to enable the mod in the Arma launcher after downloading!
+
+Now, we can quickly equip and export a loadout config like so:
+
+1. In the editor, create a unit to outfit
+1. Select them, right-click > Edit Loadout
+1. Equip them as you like
+1. In the top menu bar, select Tools > Loadout Tools > Export Loadout (CfgRespawnInventory)
+	- This will copy the loadout config to your clipboard!
+![cfgrespawninventory.png]
+Now, you can go to your description.ext file and paste in that snippet.
+
+Wrap that snippet in braces and name the class, like this:
+```
+class CfgRespawnInventory
+{
+
+	// START OF PASTE
+	class B_soldier_AR_F
+	{
+	  displayName = "Autorifleman";
+	  icon = "\A3\Ui_f\data\GUI\Cfg\Ranks\sergeant_gs.paa";
+	  role = "Default";
+	  show = "true";
+	  uniformClass = "U_B_CombatUniform_mcam_tshirt";
+	  backpack = "";
+	  weapons[] = {"arifle_MX_SW_F", "hgun_P07_F", "Throw", "Put"};
+	  magazines[] = {"SmokeShell", "HandGrenade", "SmokeShellGreen", "Chemlight_green", "100Rnd_65x39_caseless_mag", "100Rnd_65x39_caseless_mag", "100Rnd_65x39_caseless_mag", "100Rnd_65x39_caseless_mag", "100Rnd_65x39_caseless_mag", "16Rnd_9x21_Mag", "16Rnd_9x21_Mag", "Chemlight_green"};
+	  items[] = {"FirstAidKit"};
+	  linkedItems[] = {"V_PlateCarrier2_rgr", "H_HelmetB_grass", "", "ItemMap", "ItemCompass", "ItemWatch", "ItemRadio", "NVGoggles", "", "acc_pointer_IR", "", "bipod_01_F_snd", "", "", "", ""};
+	};
+	// END OF PASTE
+
+};
+```
+
+And now we can adjust the classname, displayName, and associated role for this loadout. The `role` property is the important one here; `role` decides what Role will have access to this loadout.
+
+So, if you previously named your custom role something like "Medic", you'll want to make sure you set `role = "Medic";` here. Following my previous example (since I named the Role "BluClose", I would set `role = "BlueClose";` ).
+
+And now, you can add multiple additional loadouts / roles by adding additional classes within the "CfgRoles" and "CfgRespawnInventory" sections in your description.ext.
+
+
+#### ~Tying it all together ~
+Okay, one last thing. We have *defined* these roles and loadouts, but now we need to actually *add them into the mission*. Thankfully, this is straightforward.
+
+We'll need to call a function within our **init.sqf** file for each loadout. We will be using `BIS_fnc_addRespawnInventory`. The function may be used like this:
+
+`[side, "class_name"] call BIS_fnc_addRespawnInventory`
+
+The `"class_name"` bit here is *the loadout's class name, wrapped in quotes.* So, using the above example CfgRespawnInventory code block, I would invoke the function as:
+
+`[west, "B_soldier_AR_F"] call BIS_fnc_addRespawnInventory`
+
+This function can also add limits to the amount of players that can be using the role; read more on that in the official docs [here](https://community.bistudio.com/wiki/BIS_fnc_addRespawnInventory).
+
+So now, we should have a line like that in our **init.sqf** for each loadout we want to add!
+
+This was a longer section, so let me recap briefly. We should have:
+1. Added Roles via `class CfgRoles` in our description.ext
+1. Added Loadouts via `class CfgRespawnInventory` in our description.ext
+1. Checked that each loadout has its `role` property pointed to the correct CfgRole.
+1. Called `BIS_fnc_addRespawnInventory` in init.sqf for each new loadout that we've added.
 
 [Table of Contents](#table-of-contents)
 
@@ -211,24 +277,112 @@ Either way will work! I would prefer to use code for the sake of keeping it all 
 
 [Table of Contents](#table-of-contents)
 
----
 
+---
 ### Respawn Delay
 This one was a little of a tougher one! To recap, I wanted the setup to be like so:
 - Blufor spawn delay should be twice as long as Opfor spawn delay
-- Players should select their spawnpoints, including
+	- This difference in spawn times means we'll need to set the timers via script.
+- Players should always spawn via the respawn screen, *including at the very start of the mission*
+	- (This is because I liked having players choose their loadouts this way instead of via the mission lobby)
+
+Firstly, setting a player's respawn timer is fairly straightforward, using the command `setPlayerRespawnTime <seconds>`. We just need to know when and where to use it!
+
+There are "events" that take place in the course of the mission, and when these events occur, their associated scripts will be run. For example, we're going to be adding some code to the script called "onPlayerRespawn.sqf". As you might guess, this script is executed any time that a player respawns during the mission.
+
+Just like init.sqf and description.ext, we can add our *own* onPlayerRespawn.sqf file into the mission folder, and the game will run this code at the appropriate times!
+
+It turns out that checking a player's team is fairly easy as well. In the context of onPlayerRespawn.sqf, we can refer to the variable `playerSide` and check whether it is equal to east or west -- and then set the respawn timer accordingly. For example:
+
+```
+// onPlayerRespawn.sqf
+
+if (playerSide == west) {
+	setPlayerRespawnTime 300;
+};
+
+if (playerSide == east) {
+	setPlayerRespawnTime 150;
+};
+```
+
+> Note for new coders: This is called an "If-Statement"! If the condition inside of the parentheses is true (if the player is Blufor/west), then the game will run the code inside of the curly brackets. If the condition is false, the game will skip to the next line of code after the last if-statement bracket.
+> 
+> Also note the `==`! This compares two values (which we want), while `=` *assigns* values (not what we want here).
+
+So now, if a player respawns, their delay timer will be set to the correct amount. Now we just need to handle the *initial* setting for that timer; before they "respawn" for the first time (inital spawn). This is a simple assignment in description.ext:
+
+```
+// description.ext
+
+respawnDelay = 15;
+```
+
+Now, players will have a short 15-second delay to spawn for the first time, and as soon as they do, the timer will be set to the longer amount.
 
 
 [Table of Contents](#table-of-contents)
 
 ---
-
 ### Spectating
-TODO
+To ensure I get the particular behavior that I want, I will be using a function to control the spectator. The indended behavior is that any fallen players should be able to spectate, but *only* their teammates, and *only* in 1st-person mode.
+
+I'll be using the function `BIS_fnc_EGSpectator`, because its parameters offer the ability to dictate exactly what the spectator should see. There are many parameters, so I'll link the documentation page [here](https://community.bistudio.com/wiki/BIS_fnc_EGSpectator) so that you can take a look at them.
+
+In my case, I'm using this function in two places:
+- When the player is killed, in a script called "onPlayerKilled.sqf" (works just like onPlayerRespawn.sqf!); this should put player in spectator mode.
+- When the player respawns, in our onPlayerRespawn.sqf script; this will turn off the spectator mode.
+
+```
+// onPlayerKilled.sqf
+
+["Initialize", [ player, [playerSide], true, false, false ]] call BIS_fnc_EGSpectator;
+```
+
+```
+// onPlayerRespawn.sqf
+
+["Terminate"] call BIS_fnc_EGSpectator;
+```
+
+Again, refer to the linked [documentation page](https://community.bistudio.com/wiki/BIS_fnc_EGSpectator) to see what all of those parameters mean! All-in-all, this restricts the spectator according to how I laid it out at the beginning of this section.
+
+> Note: Here is how the player will enter spectator mode in this method:
+> - Player falls
+> - Respawn screen appears
+> - Player clicks "Spectate" button at bottom
+> 
+> From here, the player will be able to Respawn after their delay is over.
 
 [Table of Contents](#table-of-contents)
+
 
 ---
 ## Wrap-up
 TODO
+[Table of Contents](#table-of-contents)
+
+
+ ---
+## Full Scripts
+```
+// init.sqf
+
+```
+
+```
+// description.sqf
+
+```
+
+```
+// onPlayerKilled.sqf
+
+```
+
+```
+// onPlayerRespawn.sqf
+
+```
+
 [Table of Contents](#table-of-contents)
