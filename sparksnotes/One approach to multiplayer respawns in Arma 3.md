@@ -36,7 +36,7 @@ After having just recently done some bugfixes, the following is my working solut
 - [Loadouts](#Loadouts)
 - [Spectating](#Spectating)
 - [Wrap-up](#Wrap-up)
-- [Full Scripts](#Full-Scripts)
+- [Assembled Scripts](#Assembled-Scripts)
 
 ## Specifications
 (Numbered list for later reference to specific points)
@@ -364,25 +364,102 @@ TODO
 
 
  ---
-## Full Scripts
+## Assembled Scripts
 ```
 // init.sqf
 
-```
+[west, 2] call BIS_fnc_respawnTickets;
+[east, 1] call BIS_fnc_respawnTickets;
 
-```
-// description.sqf
+[west,["BluforRifle",-1,-1]] call BIS_fnc_addRespawnInventory;
+[west,["BluforSMG",-1,-1]] call BIS_fnc_addRespawnInventory;
+[east,["OpforShortRifle",-1,-1]] call BIS_fnc_addRespawnInventory;
+[east,["OpforLongRifle",-1,-1]] call BIS_fnc_addRespawnInventory;
 
 ```
 
 ```
 // onPlayerKilled.sqf
 
+["Initialize", [ player, [playerSide], true, false, false ]] call BIS_fnc_EGSpectator;
 ```
 
 ```
 // onPlayerRespawn.sqf
 
+if (playerSide == west) then {
+	setPlayerRespawnTime 300;
+};
+
+if (playerSide == east) then {
+	setPlayerRespawnTime 150;
+};
+
+["Terminate"] call BIS_fnc_EGSpectator;
 ```
+
+```
+// description.ext
+
+respawnDelay = 15;
+
+
+// ROLES
+class CfgRoles
+{
+	class BluRifle
+	{
+		displayName = BluforRifle;
+		icon = "a3\Ui_f\data\GUI\Cfg\RespawnRoles\assault_ca.paa";
+	};
+	
+	class OpShort
+	{
+		displayName = OpforSR;
+		icon = "a3\Ui_f\data\GUI\Cfg\RespawnRoles\assault_ca.paa";
+	};
+};
+
+
+// LOADOUTS
+class CfgRespawnInventory
+{
+	class BluforRifle
+	{
+	  displayName = "Rifle";
+	  icon = "\A3\Ui_f\data\GUI\Cfg\Ranks\sergeant_gs.paa";
+	  role = "BluRifle";
+	  show = "true";
+	  uniformClass = "U_B_CombatUniform_mcam";
+	  backpack = "";
+	  weapons[] = {"arifle_Katiba_C_F", "hgun_P07_F", "Binocular", "Throw", "Put"};
+	  magazines[] = {"SmokeShell", "SmokeShell", "HandGrenade", "HandGrenade", "16Rnd_9x21_Mag", "16Rnd_9x21_Mag", "30Rnd_65x39_caseless_green", "30Rnd_65x39_caseless_green"};
+	  items[] = {"ACE_DefusalKit", "ACE_adenosine", "ACE_fieldDressing", "ACE_fieldDressing", "ACE_fieldDressing", "ACE_packingBandage", "ACE_packingBandage", "ACE_packingBandage", "ACE_packingBandage", "ACE_packingBandage", "ACE_packingBandage", "ACE_quikclot", "ACE_quikclot", "ACE_quikclot", "ACE_quikclot", "ACE_quikclot", "ACE_quikclot", "ACE_EarPlugs", "ACE_epinephrine", "ACE_epinephrine", "ACE_morphine", "ACE_salineIV_500", "ACE_salineIV_500", "ACE_tourniquet", "ACE_tourniquet", "ACE_tourniquet", "ACE_tourniquet"};
+	  linkedItems[] = {"V_PlateCarrier1_rgr", "H_HelmetB", "G_Bandanna_oli", "ItemMap", "ItemCompass", "ItemWatch", "ItemRadio", "", "acc_pointer_IR", "optic_Aco", "", "", "", "", ""};
+	};
+
+	class OpforShortRifle
+	{
+	  displayName = "ShortRifle";
+	  icon = "\A3\Ui_f\data\GUI\Cfg\Ranks\sergeant_gs.paa";
+	  role = "OpShort";
+	  show = "true";
+	  uniformClass = "U_O_CombatUniform_ocamo";
+	  backpack = "B_AssaultPack_mcamo";
+	  weapons[] = {"srifle_DMR_01_F", "hgun_Pistol_heavy_01_F", "Rangefinder", "Throw", "Put"};
+	  magazines[] = {"HandGrenade", "HandGrenade", "SmokeShell", "SmokeShell", "11Rnd_45ACP_Mag", "11Rnd_45ACP_Mag", "10Rnd_762x54_Mag", "10Rnd_762x54_Mag"};
+	  items[] = {"ACE_adenosine", "ACE_fieldDressing", "ACE_fieldDressing", "ACE_fieldDressing", "ACE_packingBandage", "ACE_packingBandage", "ACE_packingBandage", "ACE_packingBandage", "ACE_packingBandage", "ACE_packingBandage", "ACE_quikclot", "ACE_quikclot", "ACE_quikclot", "ACE_quikclot", "ACE_quikclot", "ACE_quikclot", "ACE_EarPlugs", "ACE_epinephrine", "ACE_epinephrine", "ACE_morphine", "ACE_salineIV_500", "ACE_salineIV_500", "ACE_tourniquet", "ACE_tourniquet", "ACE_tourniquet", "ACE_tourniquet"};
+	  linkedItems[] = {"V_TacVest_khk", "H_HelmetB_grass", "", "ItemMap", "ItemCompass", "ItemWatch", "ItemRadio", "", "", "optic_DMS", "", "", "", "", ""};
+	};
+};
+```
+```
+// in a Trigger's On Activation body
+
+[respawn_east_starting, nil, false] call BIS_fnc_moduleRespawnPosition; [respawn_west_starting, nil, false] call BIS_fnc_moduleRespawnPosition;
+[respawn_east_new, nil, true] call BIS_fnc_moduleRespawnPosition; [respawn_west_new, nil, true] call BIS_fnc_moduleRespawnPosition;
+
+```
+
 
 [Table of Contents](#table-of-contents)
