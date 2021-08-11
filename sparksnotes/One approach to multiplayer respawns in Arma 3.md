@@ -5,7 +5,7 @@ Hiya! It's always felt to me that Arma 3, despite its robust and active modding 
 
 Well, this is my attempt to add something of value so that someone new might have a *slightly* easier time. [Click here to skip to the main content!](#Table-of-Contents) The resulting files / scripts can be found in the very last section in their entirety, so you can see how it all fits together.
 
-**DISCLAIMER**: I am a relative noob when it comes to this stuff. I'll explain how I set my mission up, but your results may vary.
+**DISCLAIMER**: I am an intermediate noob when it comes to this stuff. I'll explain how I set my mission up, but your results may vary.
 
 Further, this post **assumes some foundational knowledge**, such as:
 - Being able to open the Zeus editor / open or create a new mission file,
@@ -359,7 +359,12 @@ Again, refer to the linked [documentation page](https://community.bistudio.com/w
 
 ---
 ## Wrap-up
-TODO
+Okay, there we go! Hopefully you found use in this post.
+
+If you have questions/comments about anything, OR if you found any mistakes (I probably made mistakes *somewhere*!), please feel free to contact me! You can do this here or on any listed social media. I'll probably add a link here in the future to my personal website as well, which will include a contact form.
+
+Cheers!
+
 [Table of Contents](#table-of-contents)
 
 
@@ -371,10 +376,10 @@ TODO
 [west, 2] call BIS_fnc_respawnTickets;
 [east, 1] call BIS_fnc_respawnTickets;
 
-[west,["BluforRifle",-1,-1]] call BIS_fnc_addRespawnInventory;
-[west,["BluforSMG",-1,-1]] call BIS_fnc_addRespawnInventory;
-[east,["OpforShortRifle",-1,-1]] call BIS_fnc_addRespawnInventory;
-[east,["OpforLongRifle",-1,-1]] call BIS_fnc_addRespawnInventory;
+[west,"BluforRifle"] call BIS_fnc_addRespawnInventory;
+[west,"BluforSMG"] call BIS_fnc_addRespawnInventory;
+[east,"OpforShortRifle"] call BIS_fnc_addRespawnInventory;
+[east,"OpforLongRifle"] call BIS_fnc_addRespawnInventory;
 
 ```
 
@@ -454,7 +459,8 @@ class CfgRespawnInventory
 };
 ```
 ```
-// in a Trigger's On Activation body
+// in a Trigger's On-Activation body
+// to deactivate spawpoints and activate RE-spawn points
 
 [respawn_east_starting, nil, false] call BIS_fnc_moduleRespawnPosition; [respawn_west_starting, nil, false] call BIS_fnc_moduleRespawnPosition;
 [respawn_east_new, nil, true] call BIS_fnc_moduleRespawnPosition; [respawn_west_new, nil, true] call BIS_fnc_moduleRespawnPosition;
