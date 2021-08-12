@@ -1,5 +1,5 @@
 <!-- copied from "your_first_crud_app" bc it was getting too in-depth -->
-#post #idea
+#blog #idea
 
 ## A brief background
 

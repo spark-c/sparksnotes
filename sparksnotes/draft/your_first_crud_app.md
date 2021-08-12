@@ -1,4 +1,4 @@
-#post #draft
+#blog #draft
 
 ## There's nothing wrong with the To-Do!
 

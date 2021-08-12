@@ -1,9 +1,9 @@
-#post #draft
+#blog #published
 
 # Brief Context
 Hiya! It's always felt to me that Arma 3, despite its robust modding / content scene, is not very well documented and often requires lots of bumbling around in 5yr old incomplete forum threads in order to learn anything.
 
-So, I wanted to assemble a write-up of my respawn system all in one place! Even if your mission requires a slightly different configuration, I hope that this will be a good jumping-off point. [Click here to skip to the main content!](#Table-of-Contents) The resulting files / scripts can be found in the very last section in their entirety, so you can see how it all fits together.
+So, I wanted to assemble a write-up of my respawn system all in one place! Even if your mission requires a slightly different configuration, I hope that this will be a good jumping-off point. [Click here to skip to the main content!](#table-of-contents) The resulting files / scripts can be found in the very last section in their entirety, so you can see how it all fits together.
 
 **DISCLAIMER**: I am an intermediate noob when it comes to this stuff. I'll explain how I set my mission up, but I'm likely to make mistakes and your results may vary.
 
@@ -16,7 +16,8 @@ Further, this post **assumes some foundational knowledge**, such as:
 In short, the mission I will be using as example here is called "The Hunt", the repo for which can be found [here](https://github.com/spark-c/ARMA3-the-hunt) on my github. Full game info and rules can be found in the README.md.
 
 Here is the mission description:
-![the-hunt-map]
+
+![the-hunt-map.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1628716367309/ePWlMyVQR.png)
 
 > 3-8ish players. An island off the SE coast of Malden. Opfor spawns ON the island with equipment favoring long-range engagements. Their mission is to eliminate Blufor, OR destroy both objective caches on the island. Blufor spawns just across the water on the mainland with equipment favoring short/medium-range engagements. Their mission is to eliminate Opfor, or defend the objectives for the specified period of time (currently 30 minutes).
 
@@ -27,18 +28,19 @@ After having just recently done some bugfixes, the following is my working solut
 ---
 
 # Table of Contents
-- [Brief Context](#Brief-Context) (above)
-- [Approach](#Approach)
-- [Multiplayer "Respawn" Settings](#Multiplayer-Respawn-Settings)
-- [Respawn Delay](#Respawn-Delay)
-- [Spawn/Respawn Position](#Spawn-vs-Respawn-Position)
-- [Loadouts](#Loadouts)
-- [Spectating](#Spectating)
-- [Wrap-up](#Wrap-up)
-- [Assembled Scripts](#Assembled-Scripts)
+- [Brief Context](#brief-context) (above)
+- [Approach](#approach)
+- [Multiplayer "Respawn" Settings](#multiplayer-respawn-settings)
+- [Tickets](#tickets)
+- [Respawn Delay](#respawn-delay)
+- [Spawn/Respawn Positions](#spawn-vs-respawn-positions)
+- [Loadouts](#loadouts)
+- [Spectating](#spectating)
+- [Wrap-up](#wrap-up)
+- [Assembled Scripts](#assembled-scripts)
 
 ## Specifications
-(Numbered list for later reference to specific points)
+
 1. Each side should have a set number of respawn tickets.
 1. Each side should have its *own* respawn delay time. Opfor has shorter delay.
 1. At mission start, players should spawn at specific starting locations. *After that*, however, any *re*-spawns should take place at the side's designated respawn position.
@@ -57,7 +59,7 @@ Double-click on the module marker (or Right-Click > Attributes) to open up the A
 
 Also, set the drop-down box settings in the attributes window according to how you plan to use the point. For example, my Blufor respawn point looks like this:
 
-![respawn_west.png]
+![respawn_west.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1628716384182/HoZvJY5jV.png)
 
 > Pay no mind to what I've entered in the "Name" box. I don't think I'm using that right.
 
@@ -70,7 +72,7 @@ Arma has a special convention for these respawn point names; the variable name m
 |Opfor      |`respawn_east`    |
 |Independent|`respawn_guerila`* |
 |Civillian  |`respawn_civillian`|
-*\*"guerrilla" is misspelled, but that is the correct spelling according to ARMA.*
+**"guerrilla" is misspelled, but that is the correct spelling according to ARMA.*
 
 > This is a good time to mention: Arma refers to the "BLUFOR" side as "west", and the OPFOR side as "east". You'll see this a lot in the code snippets.
 
@@ -90,13 +92,13 @@ These can be found in the top bar of the editor, under the "Attributes > Multipl
 First, under the "Respawn" tab, I've set the drop-down menu called "Respawn" to "*Respawn on Custom Position*".
 
 Then, there are four "Rulesets" boxes to be checked:
-- ***Select respawn position***: This is one part of the solution needed to allow players selecting respawn loadouts.
-	- This will have ramifications later. See [Spawn vs Respawn Positions](###Spawn-vs-Respawn-Positions).
+- ***Select respawn position:*** This is one part of the solution needed to allow players selecting respawn loadouts.
+	- This will have ramifications later. See [Spawn vs Respawn Positions](#spawn-vs-respawn-positions).
 - ***Select respawn loadout*** 
 	- We will handle this further in [Loadouts](#loadouts)).
 - ***Show respawn counter***
-- ***Subtract tickets upon respawn***: It is my preference that the respawn tickets act as a resource to be traded for a new life. It's more intuitive to me that way.
-- ***Spectator***: I want dead players to spectate their teammates in 1st person, so we will need to enable this setting to allow that.
+- ***Subtract tickets upon respawn:*** It is my preference that the respawn tickets act as a resource to be traded for a new life. It's more intuitive to me that way.
+- ***Spectator:*** I want dead players to spectate their teammates in 1st person, so we will need to enable this setting to allow that.
 
 
 [Table of Contents](#table-of-contents)
@@ -105,7 +107,9 @@ Then, there are four "Rulesets" boxes to be checked:
 ### Tickets
 In "Attributes > Multiplayer > Respawn" you can also set the number of respawn tickets that each side may have. I did this with code because I have future plans to accomodate; however, you can do it either way.
 
-If you'd like to accomplish this via code, you can set the values fairly easily! In your mission directory (i.e. \\mpmissions\\\<mission-name\>\\), check to see whether there is a file called "init.sqf". If it is not present -- create it!
+If you'd like to accomplish this via code, you can set the values fairly easily! In your mission directory (e.g. Documents/Arma 3/(arma3-profile-folder)/mpmissions/(mission-name)/), check to see whether there is a file called "init.sqf". If it is not present -- create it!
+
+(You may need to do some fishing around to find your correct Arma profile folder. The setup can be strange.)
 
 >This can be done by making a new .txt file, and then renaming it / changing the file extension to be .sqf. If you cannot see the file extensions, make sure you've enabled the "File Name Extensions" checkbox in your File Explorer > View tab (Windows).
 >
@@ -127,8 +131,8 @@ The use of this function is just `[side, #tickets] call BIS_fnc_respawnTickets;`
 > The `//` double-slashes mean that anything written *after* them will be ignored by the game and *not* used as code. These are called "Comments"! They help humans leave notes for other humans, without disrupting the code.
 
 > This function can also live in other places in the mission to accomplish different tasks. For example, you could set up a trigger somewhere in the mission to detect when a BLUFOR soldier makes it to a certain zone. When the trigger activates, this function can be used in the trigger body to reset the BLUFOR respawn ticket counter (i.e. a checkpoint).
-> 
-> ![respawntickets-trigger.png]
+
+![respawntickets-trigger.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1628716477285/ATElhuQam.png)
 
 [Table of Contents](#table-of-contents)
 
@@ -191,7 +195,9 @@ Now, we can quickly equip and export a loadout config like so:
 1. Equip them as you like
 1. In the top menu bar, select Tools > Loadout Tools > Export Loadout (CfgRespawnInventory)
 	- This will copy the loadout config to your clipboard!
-![cfgrespawninventory.png]
+
+![cfgrespawninventory.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1628716498470/Q_FMzxqga.png)
+
 Now, you can go to your description.ext file and paste in that snippet.
 
 Wrap that snippet in braces and name the class, like this:
@@ -245,6 +251,8 @@ This was a longer section, so let me recap briefly. We should have:
 1. Added Loadouts via `class CfgRespawnInventory` in our description.ext
 1. Checked that each loadout has its `role` property pointed to the correct CfgRole.
 1. Called `BIS_fnc_addRespawnInventory` in init.sqf for each new loadout that we've added.
+
+![respawn_bar.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1628786023400/Ve3y9NmST.png)
 
 [Table of Contents](#table-of-contents)
 
@@ -325,7 +333,7 @@ if (playerSide == east) {
 > 
 > Also note the `==`! This compares two values (which we want), while `=` *assigns* values (not what we want here).
 
-Now when a player respawns, their delay timer will be set to the correct amount. Now we just need to handle the *initial* setting for that timer; before they "respawn" for the first time (inital spawn). This is a simple assignment in description.ext:
+Now when a player respawns, their delay timer will be set to the correct amount! Next we just need to handle the *initial* setting for that timer; before they "respawn" for the first time (inital spawn). This is a simple assignment in description.ext:
 
 ```
 // description.ext
@@ -333,7 +341,7 @@ Now when a player respawns, their delay timer will be set to the correct amount.
 respawnDelay = 15;
 ```
 
-Now, players will have a short 15-second delay to spawn for the first time, and as soon as they do, the timer will be set to the longer amount.
+This means that players will have a short 15-second delay to spawn for the first time, and as soon as they do, the timer will be set to the longer amount.
 
 > If we didn't handle that initial setting of respawnDelay, the game would make players wait for the full delay time of 150 or 300 seconds before they were able to spawn for the first time!
 
@@ -371,6 +379,9 @@ Again, refer to the linked [documentation page](https://community.bistudio.com/w
 > 
 > From here, the player will be able to Respawn after their delay is over.
 
+
+![resp vs spec draft.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1628785951493/WjSZl2vXh.png)
+
 [Table of Contents](#table-of-contents)
 
 
@@ -378,9 +389,14 @@ Again, refer to the linked [documentation page](https://community.bistudio.com/w
 ## Wrap-up
 Okay, there we go! Hopefully you found use in this post.
 
-If you have questions/comments about anything, OR if you found any mistakes (I probably made mistakes *somewhere*!), please feel free to contact me! You can do this here or on any listed social media. I'll probably add a link here in the future to my personal website as well, which will include a contact form.
+If you have questions/comments about anything, OR if you found any mistakes (I probably made mistakes *somewhere*!), please feel free to contact me! You can do this here / in the comments, or on any listed social media platform.
+
+I'll probably add a link here in the future to my personal website as well, which will include a contact form.
 
 Cheers!
+
+
+![dance.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1628787994259/dTK-opNPC.png)
 
 [Table of Contents](#table-of-contents)
 

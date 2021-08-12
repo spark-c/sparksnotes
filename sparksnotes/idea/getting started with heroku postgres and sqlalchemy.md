@@ -1,4 +1,4 @@
-#post #idea 
+#blog #idea 
 
 It would be nice to have a little walkthrough from setting up db in memory thru deploying on heroku w db.
 

@@ -1,5 +1,5 @@
 <!-- Written and published 7-26-2021 by Collin Sparks -->
-#post #published
+#blog #published
 
 # My Background in Dance
 

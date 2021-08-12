@@ -1,3 +1,5 @@
+#blog
+
 ## WidgetBotIO is a thing!
 
 You can embed a discord 'server' in your webpage. Neat!

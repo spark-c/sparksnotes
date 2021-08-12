@@ -1,4 +1,4 @@
-#post #idea 
+#blog #idea 
 
 # You should write a discord bot.
 
