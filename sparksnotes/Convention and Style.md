@@ -1,0 +1,1 @@
+[[Reduce your code complexity by returning early!]]
