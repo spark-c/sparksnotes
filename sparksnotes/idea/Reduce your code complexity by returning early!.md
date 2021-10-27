@@ -64,4 +64,4 @@ def my_function():
     return do_the_work()
 ```
 
-This pattern is often referred to as "returning early". If there can be a problem, go ahead and check for it at the beginning. This way, if the code makes it all the way through the error-checking part at the top, then you can stop worrying about whether the function's arguments are correct, and you can focus just on what the function is supposed to be doing. And no more pesky nesting making it hard to read! :)
+This pattern is often referred to as "returning early," and the statements themselves can be called "guard clauses". If there can be a problem, go ahead and check for it at the beginning. This way, if the code makes it all the way through the error-checking part at the top, then you can stop worrying about whether the function's arguments are correct, and you can focus just on what the function is supposed to be doing. And no more pesky nesting making it hard to read!
