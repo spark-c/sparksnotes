@@ -1,0 +1,2 @@
+- The Listkeeper cog (cogs/Listkeeper.py) is the only one which interacts with the database, so it is currently arranged so that it attempts to make a connection to the database any time the Listkeeper cog is loaded.
+- The Listkeeper cog contains the commands that people use to interact with the database
