@@ -22,8 +22,12 @@ These are the relevant libraries I'm using:
 ## Table of Contents
 - The Project
 - The Models
-- 
-- PostGeneration (method replaced by its output)
+- Approach to building factories
+- Creating fake data
+	- LazyAttributes
+- Building relationships
+	- SubFactories
+	- PostGeneration (for the "many" part)
 - Common Errors
 	- Mapped Class "Model -> Model"
 	- Object "Faker" is not callable (Lazyattr expects lambda)
@@ -217,3 +221,52 @@ email = factory.LazyAttribute(lambda obj: f"{obj.fname}.{obj.lname}@xyzcorp.com"
 *See also: [factory.LazyFunction](https://factoryboy.readthedocs.io/en/stable/introduction.html#lazyfunction) for when you need a function but not the object*
 
 ## Building relationships
+
+### SubFactories
+Once we're able to build objects for single models, we then need to show our factories how multiple objects should be connected. One tool for doing so will be the [`factory.SubFactory`](https://factoryboy.readthedocs.io/en/stable/reference.html#subfactory). As a factory is creating a new object, when it reaches an attribute which calls `SubFactory` with another model's factory, it will go and create *that* object before continuing on with the current one.
+
+For example, a `Person` model might be related to a `Pet` model. While creating a `Person`, we might see something like `pet = factory.SubFactory(Pet)`. A new `Pet` will be created, and attached to our `Person`.
+
+In the case of our models here, the relationship between our `Users` and `Clients` may looks like this:
+```python
+# factories/users.py
+class UsersFactory(factory.alchemy.SQLAlchemyModelFactory):
+	class Meta:
+		model = Users
+		sqlalchemy_session = db.session
+
+	id = factory.Sequence(lambda n: n + 1)
+	first_name = factory.Faker("first_name")
+	last_name = factory.Faker("last_name")
+	email = factory.LazyAttribute(lambda c: f"{c.first_name}.{c.last_name}@gmail.com".lower())
+	
+	# We will use a different strategy, described later, to attach Clients here.
+	
+# factories/clients.py
+class ClientsFactory(factory.alchemy.SQLAlchemyModelFactory):
+	class Meta:
+		model = Clients
+		sqlalchemy_session = db.session
+
+	id = factory.Sequence(lambda n: n + 1)
+	name = factory.Faker("name")
+	company_name = factory.Faker("company")
+	email = factory.LazyAttribute(lambda c: f"{name.replace(" ", "")}@email.com".lower())
+
+	user = factory.SubFactory("factories.users.UsersFactory")
+	user_id = factory.SelfAttribute("user.id")
+```
+> ***Wait, why are we giving `factory.SubFactory` a string?***
+> 
+> *[Circular imports](https://factoryboy.readthedocs.io/en/stable/reference.html#subfactory-circular)! Imagine we want to create a `User`. In the process of creating a `User`, Factory-Boy will create a related `Client`. But wait... when we go to create that `Client`, the factory will attempt to go back and create a related `User`!*
+> 
+> *To handle this loop, we pass an absolute path (string) to `factory.SubFactory` instead of just passing the factory itself. The library will handle it accordingly!*
+
+So, now we can create singularly related objects. But I promised One-To-Many relationships!
+
+### PostGeneration (for the "many" part)
+This is another strategy which can be very useful! As the name implies, "PostGeneration" code runs after the object in question is finished generating. It can be used for all sorts of purposes, but in this case, we will use it to create some related objects.
+
+Syntatically, there are a few ways to implement this behavior; my preferred style is with the [`@factory.post_generation`](https://factoryboy.readthedocs.io/en/stable/reference.html#factory.post_generation) function decorator.
+
+It may feel a little odd, and your code linter may complain -- but we will write a *method* on our factory object with the same name as our desired attribute. By the end, this method will be replaced 
