@@ -265,8 +265,29 @@ class ClientsFactory(factory.alchemy.SQLAlchemyModelFactory):
 So, now we can create singularly related objects. But I promised One-To-Many relationships!
 
 ### PostGeneration (for the "many" part)
-This is another strategy which can be very useful! As the name implies, "PostGeneration" code runs after the object in question is finished generating. It can be used for all sorts of purposes, but in this case, we will use it to create some related objects.
+As the name implies, "PostGeneration" code runs after the object in question is finished generating. It can be used for all sorts of purposes, but in this case, we will use it to create some related objects.
 
 Syntatically, there are a few ways to implement this behavior; my preferred style is with the [`@factory.post_generation`](https://factoryboy.readthedocs.io/en/stable/reference.html#factory.post_generation) function decorator.
 
-It may feel a little odd, and your code linter may complain -- but we will write a *method* on our factory object with the same name as our desired attribute. By the end, this method will be replaced 
+Therea are a couple of arguments to know about when using this hook: `create`, and `extracted`.
+- `create` refers to the build strategy of the object, generally "create" or "build". By default, "create" is used; this makes an object and stores it, whereas build makes an object but does *not* store it (documentation [here](https://factoryboy.readthedocs.io/en/stable/reference.html#factory.CREATE_STRATEGY)).
+- `extracted` and `**kwargs` are a little beyond the scope of this particular piece, but I encourage you to take a quick look at the documentation [here](https://factoryboy.readthedocs.io/en/stable/reference.html#extracting-parameters). Simply put, using a particular syntax, you can pass data from the factory creation function all the way down into the post_generation hook.
+
+Our post-generation methods might follow this pattern:
+```python
+class UsersFactory(factory.alchemy.SQLAlchemyModelFactory):
+	# regular attributes here
+	
+	@factory.post_generation
+	def populate_clients(self, create, extracted, **kwargs):
+		if not create:
+			return
+			
+		if extracted:
+			# handle the passed arguments
+		
+		else:
+			ClientsFactory.create(user=self)
+
+```
+
