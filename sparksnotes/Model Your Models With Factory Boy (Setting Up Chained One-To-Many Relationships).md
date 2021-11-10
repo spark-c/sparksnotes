@@ -33,11 +33,12 @@ These are the relevant libraries I'm using:
 - A tip for improving tests: Subclassed Factories
 - Final Code Samples
 - Common Errors
-	- Mapped Class "Model -> Model"
-	- Object "Faker" is not callable (Lazyattr expects lambda)
+	- TypeError: "my_attribute" is an invalid keyword argument for "MyModel"
+	- TypeError: "Faker" object is not callable
 - Additional Resources
+	- [Another article on One-to-Many relationships in Factory-Boy](https://simpleit.rocks/python/django/setting-up-a-factory-for-one-to-many-relationships-in-factoryboy/)
 	- [Factory-Boy Documentation](https://factoryboy.readthedocs.io/en/stable/)
-	- [another article on one-to-many](https://simpleit.rocks/python/django/setting-up-a-factory-for-one-to-many-relationships-in-factoryboy/)
+	- [SQLAlchemy ORM Exceptions Reference](https://docs.sqlalchemy.org/en/14/orm/exceptions.html)
 
 ---
 
@@ -583,3 +584,112 @@ class InvoicesFactoryBase(factory.alchemy.SQLAlchemyModelFactory):
 	contract_id = factory.SelfAttribute("contract.id")
 
 ```
+
+## A Few Common Errors
+Here are a couple of frequent exceptions / errors that I encountered while learning to work with the library. I know there are more than I can remember right now -- I'll update the list if I encounter them in the future.
+
+---
+
+### TypeError: "Faker" object is not callable
+- **Library**: Factory-Boy
+- **Cause**: This may indicate misuse of a `factory.LazyAttribute()` somewhere. *This function expects to be passed a function as an argument, often a `lambda` function*. Example:
+```python
+is_child = factory.Faker("boolean")
+allowed_to_drive = factory.LazyAttribute(lambda obj: False if obj.is_child else True)
+```
+If the thing passed to `LazyAttribute` is not callable (a funtion), it will result in this error.
+- **Sample Traceback**:
+```python
+venv\lib\site-packages\factory\base.py:528: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+venv\lib\site-packages\factory\alchemy.py:51: in _generate
+    return super()._generate(strategy, params)
+venv\lib\site-packages\factory\base.py:465: in _generate
+    return step.build()
+venv\lib\site-packages\factory\builder.py:258: in build
+    step.resolve(pre)
+venv\lib\site-packages\factory\builder.py:199: in resolve
+    self.attributes[field_name] = getattr(self.stub, field_name)
+venv\lib\site-packages\factory\builder.py:344: in __getattr__
+    value = value.evaluate_pre(
+venv\lib\site-packages\factory\declarations.py:48: in evaluate_pre
+    return self.evaluate(instance, step, context)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <factory.declarations.LazyAttribute object at 0x000002627C5C7820>
+instance = <Resolver for <BuildStep for <StepBuilder(<SQLAlchemyOptions for IsolatedUsersFactory>, strategy='create')>>>
+step = <BuildStep for <StepBuilder(<SQLAlchemyOptions for IsolatedUsersFactory>, strategy='create')>>, extra = {}
+
+    def evaluate(self, instance, step, extra):
+        logger.debug("LazyAttribute: Evaluating %r on %r", self.function, instance)
+>       return self.function(instance)
+E       TypeError: 'Faker' object is not callable
+
+venv\lib\site-packages\factory\declarations.py:100: TypeError
+```
+
+---
+
+### TypeError: "my_attribute" is an invalid keyword argument for "MyModel"
+- **Library**: SQLAlchemy
+- **Cause**: You may have an attribute defined in your Factory, which is not defined in your model. E.g. `MyModel` does not have a field/column for `my_attribute`.
+- **Sample Traceback**:
+```python
+venv\lib\site-packages\factory\base.py:528: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+venv\lib\site-packages\factory\alchemy.py:51: in _generate
+    return super()._generate(strategy, params)
+venv\lib\site-packages\factory\base.py:465: in _generate
+    return step.build()
+venv\lib\site-packages\factory\builder.py:262: in build
+    instance = self.factory_meta.instantiate(
+venv\lib\site-packages\factory\base.py:317: in instantiate
+    return self.factory._create(model, *args, **kwargs)
+venv\lib\site-packages\factory\alchemy.py:99: in _create
+    return cls._save(model_class, session, *args, **kwargs)
+venv\lib\site-packages\factory\alchemy.py:105: in _save
+    obj = model_class(*args, **kwargs)
+<string>:4: in __init__
+    ???
+venv\lib\site-packages\sqlalchemy\orm\state.py:480: in _initialize_instance
+    manager.dispatch.init_failure(self, args, kwargs)
+venv\lib\site-packages\sqlalchemy\util\langhelpers.py:70: in __exit__
+    compat.raise_(
+venv\lib\site-packages\sqlalchemy\util\compat.py:207: in raise_
+    raise exception
+venv\lib\site-packages\sqlalchemy\orm\state.py:477: in _initialize_instance
+    return manager.original_init(*mixed[1:], **kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Users (transient 2153595579984)>
+kwargs = {'blah': 'hello', 'clients': [], 'email': 'kristi.ibarra@gmail.com', 'first_name': 'Kristi', ...}
+cls_ = <class 'api.models.users.Users'>, k = 'blah'
+
+    def _declarative_constructor(self, **kwargs):
+        """A simple constructor that allows initialization from kwargs.
+
+        Sets attributes on the constructed instance using the names and
+        values in ``kwargs``.
+
+        Only keys that are present as
+        attributes of the instance's class are allowed. These could be,
+        for example, any mapped columns or relationships.
+        """
+        cls_ = type(self)
+        for k in kwargs:
+            if not hasattr(cls_, k):
+>               raise TypeError(
+                    "%r is an invalid keyword argument for %s" % (k, cls_.__name__)
+                )
+E               TypeError: 'blah' is an invalid keyword argument for Users
+
+venv\lib\site-packages\sqlalchemy\orm\decl_base.py:1142: TypeError
+```
+
+---
+
+## Additional Resources
+A few things that may be useful:
+- [Another article on One-to-Many relationships in Factory-Boy](https://simpleit.rocks/python/django/setting-up-a-factory-for-one-to-many-relationships-in-factoryboy/)
+- [Factory-Boy Documentation](https://factoryboy.readthedocs.io/en/stable/)
+- [SQLAlchemy ORM Exceptions Reference](https://docs.sqlalchemy.org/en/14/orm/exceptions.html)
