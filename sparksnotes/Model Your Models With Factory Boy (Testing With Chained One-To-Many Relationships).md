@@ -31,7 +31,7 @@ These are the relevant libraries I'm using:
 	- SubFactories
 	- PostGeneration (for the "many" part)
 - A tip for improving tests: Subclassed Factories
-- Final Code Examples
+- Final Code Samples
 - Common Errors
 	- Mapped Class "Model -> Model"
 	- Object "Faker" is not callable (Lazyattr expects lambda)
@@ -162,7 +162,7 @@ Each model will need at least one corresponding factory -- the `factory` module 
 
 Let's begin building a factory representation of our `Users` model -- I'll start with a couple of tests to describe what I'd like to see:
 
-> ***Reader, please note**: The following code is not in its final verison; by the end, we will have made a couple of improvements. To see it all in its finished state, please visit the [#Code-Samples] section at the end.
+> ***Reader, please note**: The following code is not in its final verison; by the end, we will have made a couple of improvements. To see it all in its finished state, please visit the [#Final-Code-Samples] section at the end.
 
 ```python
 # test_users.py
@@ -215,19 +215,35 @@ Upon calling UsersFactory.create(), factory-boy will create a new entry in the d
 ## Creating fake data
 **`factory.Sequence`** automatically increments a number `n` and gives it to its `lambda` function; with the simple `lambda` used above, we will get ids incrementing up from 1.
 
+---
+
 **`factory.Faker`** is your bread-and-butter in terms of creating fake data. `Factory-Boy` implements its own wrapper of the `faker` library: Where you may normally call a faker *provider* (e.g. `fake.name()` to get a result like `Jane Doe`), we now use `factory.Faker()` and pass it the *name* of the provider instead as the first argument (`factory.Faker("name")`).
 
 Some providers accept arguments (e.g. `fake.sentence(nb_words=6)`); in our case, we will supply those values as arguments following the provider name: `factory.Faker("sentence", nb_words=6)`.
 
+---
+
 **`factory.LazyAttribute`** can be useful for creating data that depends on other information from the same object. To use it, pass `factory.LazyAttribute()` a `lambda` function which handles the object instance as argument. A common example is an email field that is built from an employee's first and last name:
 ```python
 # EmployeeFactory
-
 email = factory.LazyAttribute(lambda obj: f"{obj.fname}.{obj.lname}@xyzcorp.com")
 ```
 *See also: [factory.LazyFunction](https://factoryboy.readthedocs.io/en/stable/introduction.html#lazyfunction) for when you need a function but not the object*
 
-**`factory.SelfAttribute`**
+---
+
+**`factory.SelfAttribute`** is used by an object to access data from another one of its attributes, by passing it a string. In our case, consider a `client` which stores a reference to its parent `user` object. If we want to define `client.user_id`, we might use `user_id = factory.SelfAttribute("user.id")`.
+
+Interestingly, we can also access the parent object's attributes! Using Python relative import syntax / dot notation, we could access `client.user.name` like
+```python
+# in ClientsFactory class
+name_of_parent_user = factory.SelfAttribute("..name")`.
+```
+*See the docs for this function [here](https://factoryboy.readthedocs.io/en/stable/reference.html?highlight=selfattribut#factory.SelfAttribute)*
+
+This will come into play once we've created relationships between our factories.
+
+---
 
 There are many ways to get your data into the right places, but this will be enough for our purposes.
 
