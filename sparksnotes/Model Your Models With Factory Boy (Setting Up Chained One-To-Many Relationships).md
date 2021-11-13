@@ -6,9 +6,9 @@ Factory-Boy is a super useful Python library used to replace "...static, hard to
 
 (Quoted from the [factory-boy documentation](https://factoryboy.readthedocs.io/en/stable/))
 
-Essentially, rather than having to build your test objects from scratch, or maintain a database full of test data -- Factory-Boy can do the heavy lifting for you! Once configured, the tool will create test objects with randomly generated test data (any detail of which you can override with custom values when you call for the object to be generated).
+Essentially, rather than having to build your test objects from scratch, or maintain a database full of test data -- Factory-Boy can do the heavy lifting for you! Once configured, the tool will create test objects with randomly generated test data (any detail of which you can override with custom values when you call for the object to be made).
 
-For newer users like me, the setup can be a bit daunting though! Correctly configuring the relationships caused some grief. I'd like to walk you through the pattern I've settled on (for the moment), so that you may have a nicer starting point on your project.
+For newer users like me, the setup can be a bit daunting though! Configuring the relationships caused some grief. I'd like to walk you through the pattern I've settled on (for the moment), so that you may have a nicer starting point on your project.
 
 These are the relevant libraries I'm using:
 - factory-boy
@@ -182,6 +182,7 @@ def test_create_user():
 	
 		def test_user_has_id(self):
 			user = UsersFactory.create()
+			# perhaps check that the data is the correct type, etc
 			assert user.id
 			
 		def test_user_has_name(self):
@@ -214,11 +215,11 @@ class UsersFactory(factory.alchemy.SQLAlchemyModelFactory):
 Upon calling UsersFactory.create(), factory-boy will create a new entry in the database and will use these attributes to populate the data columns.
 
 ## Creating fake data
-**`factory.Sequence`** automatically increments a number `n` and gives it to its `lambda` function; with the simple `lambda` used above, we will get ids incrementing up from 1.
+**`factory.Sequence`** automatically increments a number `n` and gives it to its `lambda` function; with the simple `lambda` function above, we will get ids incrementing up from 1. You could absolutely go as simply as `lambda n: n` to get incrementing numbers -- I used `n + 1` to ensure that `n` was never zero.
 
 ---
 
-**`factory.Faker`** is your bread-and-butter in terms of creating fake data. `Factory-Boy` implements its own wrapper of the `faker` library: Where you may normally call a faker *provider* (e.g. `fake.name()` to get a result like `Jane Doe`), we now use `factory.Faker()` and pass it the *name* of the provider instead as the first argument (`factory.Faker("name")`).
+**`factory.Faker`** is your bread-and-butter in terms of creating fake data. `Factory-Boy` implements its own wrapper of the `faker` library: Where you may normally call a faker *provider* (e.g. `fake.name()` to get a result like `Jane Doe`), we now use `factory.Faker()` and pass it the *name of the provider* instead as the first argument (`factory.Faker("name")`).
 
 Some providers accept arguments (e.g. `fake.sentence(nb_words=6)`); in our case, we will supply those values as arguments following the provider name: `factory.Faker("sentence", nb_words=6)`.
 
@@ -255,7 +256,7 @@ Once we're able to build objects for single models, we then need to show our fac
 
 For example, a `Person` model might be related to a `Pet` model. While creating a `Person`, we might see something like `pet = factory.SubFactory(Pet)`. A new `Pet` will be created, and attached to our `Person`.
 
-In the case of our models here, the relationship between our `Users` and `Clients` may looks like this:
+In the case of our models here, the relationship between our `Users` and `Clients` may look like this:
 ```python
 # factories/users.py
 class UsersFactory(factory.alchemy.SQLAlchemyModelFactory):
