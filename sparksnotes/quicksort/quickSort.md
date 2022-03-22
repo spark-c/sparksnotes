@@ -40,5 +40,15 @@ Now we will find the median of the values found at those indexes: `arr[0]`, `arr
 
 And that's it! We can use 60 as our pivot value, and it will be reasonably likely that this value will not lead to *O*(*n^2*) time.
 
+Here is how you might implement this in code:
+```javascript
+function getMedianOfThree(arr, start, end) {
+    const medianArray = [arr[start], arr[Math.floor(arr.length / 2)], arr[end]];
+    return medianArray.sort()[1];
+}
+```
+
 
 ## 2. Comparing elements to the Pivot value
+
+Now we need use our pivot value to help arrange the remaining elements.
