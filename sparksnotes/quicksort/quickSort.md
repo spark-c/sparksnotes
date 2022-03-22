@@ -1,4 +1,4 @@
-# A look at the Lomuto QuickSort algorithm in JavaScript with median-of-three partition selection
+# A look at the Lomuto QuickSort algorithm in JavaScript with median-of-three pivot selection
 
 ## Benefits/Drawbacks
 
