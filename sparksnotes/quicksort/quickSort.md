@@ -56,22 +56,24 @@ Here is how you might implement this in code -- this function will decide which 
  * Returns: the median value, its index.
  */
 function getMedianOfThree(arr, start, end) {
-	const medianIndex = Math.floor(arr.length / 2)
-	const medianArray = [
+	let middleIndex = Math.floor((start + end) / 2)
+	let medianArray = [
 		arr[start],
-		arr[medianIndex],
+		arr[middleIndex],
 		arr[end]
 	]
 
-	const target = medianArray.sort()[1]
+    // Array.prototype.sort() sorts by ASCII value by default,
+    // so we pass our own sort function.
+	let target = medianArray.sort((a, b) => {return a - b;})[1]
 	// See which value was the median, and return that value and its index.
 	switch (target) {
 		case arr[start]:
-			return arr[start], start
-		case arr[medianIndex]:
-			return arr[medianIndex], medianIndex
+			return [arr[start], start]
+		case arr[middleIndex]:
+			return [arr[middleIndex], middleIndex]
 		case arr[end]:
-			return arr[end], end
+			return [arr[end], end]
 	}
 }
 ```
@@ -115,7 +117,7 @@ And next, let's put it to work alongside the logic for the sort! Most resources 
 function partition(arr, start, end) {
 
     // Approximate the median and move that value to the end of the array
-	let pivot, pivotIndex = getMedianOfThree(arr, start, end)
+	let [ pivot, pivotIndex ] = getMedianOfThree(arr, start, end)
     swap(arr, pivotIndex, end)
 
 	let i = start - 1;
@@ -133,17 +135,32 @@ function partition(arr, start, end) {
 	}
 
     // Swap the pivot value to the spot after i.
-	swap(arr, i + 1, high);
+	swap(arr, i + 1, end);
     // Now all elements left of pivot are lesser,
     // and all elements right of pivot are greater!
 
-	return i + 1; // the index of pivot.
+    // Return the index of pivot, which represents the boundary
+    // between the left and right partitions
+	return i + 1;
+}
 ```
 
 And now, we may define the `quickSort` function that will run this process until complete:
 
 ```javascript
+function quickSort(arr, start, end) {
 
+    // Eventually as the sort progresses, start will == end
+    // and our sort will be complete.
+    if (start < end){
+        let partitionIndex = partition(arr, start, end)
+
+        // Sort both partitions;
+        // arr[partitionIndex] is already in the correct place.
+        quickSort(arr, start, partitionIndex - 1)
+        quickSort(arr, partitionIndex + 1, end)
+    }
+}
 ```
 
 
