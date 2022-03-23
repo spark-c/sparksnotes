@@ -1,4 +1,4 @@
-# A look at the Lomuto Quicksort algorithm in JavaScript with median-of-three pivot selection
+# Implementing a Lomuto Quicksort algorithm in JavaScript with median-of-three pivot selection
 
 ## Background
 
@@ -122,6 +122,10 @@ function swap(arr, i, j) {
 And next, let's put it to work alongside the logic for the sort! Most resources call this function "partition", and I'll continue with that convention.
 
 ```javascript
+ /** Contains the logic of the sort.
+ * Handles swapping values in the array as appropriate,
+ * and then returns the boundary index of the resulting partition
+ */
 function partition(arr, start, end) {
 
     // Approximate the median and move that value to the end of the array
@@ -156,6 +160,9 @@ function partition(arr, start, end) {
 And now, we may define the `quickSort` function that will run this process until complete:
 
 ```javascript
+ /** Begins the process of the sort
+ * and recurses until complete
+ */
 function quickSort(arr, start, end) {
 
     // Eventually as the sort progresses, start will == end
