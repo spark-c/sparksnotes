@@ -1,10 +1,16 @@
 # A look at the Lomuto QuickSort algorithm in JavaScript with median-of-three pivot selection
 
-## Benefits/Drawbacks
+## Background
 
-The Quicksort algorithm is a strong general-purpose algorithm which is reasonably fast and is an "in-place" operation; it requires very little additional memory to perform.
+The Quicksort algorithm is a strong general-purpose sorting method which is reasonably fast and is an "in-place" operation; it requires very little additional memory to perform.
 
 There are some cases where it could work in *O*(*n^2*) time, although it can usually be expected to be closer to *O*(*n* log *n*); especially using the "median-of-three" technique that I will describe later.
+
+The method we will use to implement this algorithm is called the *Lomuto Quicksort*, named for Nico Lomuto -- it is not quite as efficient as the *Hoare Quicksort* (Lomuto's takes around 3x as many swap operations!), however its implementation is a bit more straightforward and easier to understand.
+
+> *For a more detailed comparison between the two Quicksort flavors, take a look at [this article](https://www.interviewkickstart.com/learn/hoares-vs-lomuto-partition-scheme-quicksort)!*
+
+Finally, it's good to note that Quicksort is an *unstable* sort -- this means that items which are equal in the original array are *not guaranteed* to stay in the same order relative to each other after the Quicksort is completed. For more information, see this [article](https://www.geeksforgeeks.org/stability-in-sorting-algorithms/).
 
 ## Overview
 
@@ -182,4 +188,5 @@ console.log(sortMe)
 * General Information: https://en.wikipedia.org/wiki/Quicksort
 * Strategies for improving performance: https://www.cs.cornell.edu/courses/JavaAndDS/files/sort3Quicksort3.pdf
 * Another nice high-level overview of quicksort and median-of-three: https://stackoverflow.com/a/33979439
+* Stable and unstable sorts: https://www.geeksforgeeks.org/stability-in-sorting-algorithms/
 * Comparison between Lomuto and Hoare Quicksort implementations: https://www.interviewkickstart.com/learn/hoares-vs-lomuto-partition-scheme-quicksort
