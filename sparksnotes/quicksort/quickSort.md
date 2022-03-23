@@ -1,4 +1,4 @@
-# A look at the Lomuto QuickSort algorithm in JavaScript with median-of-three pivot selection
+# A look at the Lomuto Quicksort algorithm in JavaScript with median-of-three pivot selection
 
 ## Background
 
@@ -36,7 +36,7 @@ Most of our functions for this algorithm should be taking three arguments:
 * `end`: The final index (inclusive) of the partition to sort.
 * (our `swap` function will take `arr`, index `i`, and index `j` instead)
 
-This is important! We are passing these `start`/`end` indices each time, because our algorthim will be called recursively on several sections of our array. This allows us to work in-place in memory, instead of needing to create many new and/or temporary arrays in the process of the sort.
+This is important! We are passing these `start`/`end` indices each time, because our algorithm will be called recursively on several sections of our array. This allows us to work in-place in memory, instead of needing to create many new and/or temporary arrays in the process of the sort.
 
 ## 1. Choosing the Pivot
 
@@ -101,7 +101,7 @@ There will be a few steps to do this:
     * If `arr[j]` is greater than pivot, simply increment `j` by 1, and begin again.
     * Else, if `arr[j]` is less than pivot, then increment `i` by 1 *and **then*** swap the values found at `arr[j]` and `arr[i]`. Finally, increment `j` by 1. If `i === j`, don't worry; the element does not change and the process can move forward.
 1. When `j === end`, swap the pivot value (found at `arr[end]`) with the index `i + 1`. Now, all values before the pivot value should be lesser, and all values to the right of the pivot value should be greater. We've created a new partition on either side of the pivot!
-1. Then, call the quicksort function again on both partitions (not including the pivot, which is now already in its correct location):
+1. Then, call the `quickSort` (defined later) function again on both partitions (not including the pivot, which is now already in its correct location):
     ```javascript
     quickSort(arr, start, pivotIndex - 1) // the left partition
     quickSort(arr, pivotIndex + 1, end) // the right partition
@@ -170,7 +170,7 @@ function quickSort(arr, start, end) {
     }
 }
 ```
-And there we go! With all of the tools we have created above, we have a working QuickSort. You can give it a try with the array below.
+And there we go! With all of the tools we have created above, we have a working Quicksort. You can give it a try with the array below.
 
 ```javascript
 const sortMe = [7, 3, 8, 8, 1, 63, 8, 15, 2, 9, 2, 7, 45, 2, 9, 152, 489, 126, 489, 126, 948, 5, 2, 7, 423, 96, 24, 7, 23, 49, 26, 54, 23, 7, 2, 79, 56, 2, 52, 243, 267, 23, 726, 0, 459, 126, 5, 2, 5, 2, 786, 2, 645, 423, 57, 2, 5, 42, 45, 5, 68, 53, 486, 51, 81, 5, 5, 53, 853, 1, 453, 53, 853, 135, 531, 8, 53, 13, 13, 100]
