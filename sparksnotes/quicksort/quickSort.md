@@ -77,3 +77,13 @@ There will be a few steps to do this:
     quickSort(arr, start, pivotIndex - 1) // the left partition
     quickSort(arr, pivotIndex + 1, end) // the right partition
     ```
+
+
+
+## References
+
+* Video: https://www.youtube.com/watch?v=MZaf_9IZCrc
+* Infographic: https://www.techiedelight.com/quicksort/
+* General Information: https://en.wikipedia.org/wiki/Quicksort
+* Strategies for improving performance: https://www.cs.cornell.edu/courses/JavaAndDS/files/sort3Quicksort3.pdf
+* Another nice high-level overview of quicksort and median-of-three: https://stackoverflow.com/a/33979439
