@@ -49,11 +49,30 @@ Now we will find the median of the values found at those indexes: `arr[0]`, `arr
 
 And that's it! We can use 60 as our pivot value, and it will be reasonably likely that this value will not lead to *O*(*n^2*) time.
 
-Here is how you might implement this in code:
+Here is how you might implement this in code -- this function will decide which value is the median, and return that value as well as its index in `arr`:
 ```javascript
+ /** Approximates the median of a given array of comparables.
+ * Accepts: an array, a start index, and end index.
+ * Returns: the median value, its index.
+ */
 function getMedianOfThree(arr, start, end) {
-    const medianArray = [arr[start], arr[Math.floor(arr.length / 2)], arr[end]];
-    return medianArray.sort()[1];
+	const medianIndex = Math.floor(arr.length / 2)
+	const medianArray = [
+		arr[start],
+		arr[medianIndex],
+		arr[end]
+	]
+
+	const target = medianArray.sort()[1]
+	// See which value was the median, and return that value and its index.
+	switch (target) {
+		case arr[start]:
+			return arr[start], start
+		case arr[medianIndex]:
+			return arr[medianIndex], medianIndex
+		case arr[end]:
+			return arr[end], end
+	}
 }
 ```
 
@@ -77,6 +96,55 @@ There will be a few steps to do this:
     quickSort(arr, start, pivotIndex - 1) // the left partition
     quickSort(arr, pivotIndex + 1, end) // the right partition
     ```
+
+
+## 2.5 Compare / Swap code
+
+Okay, first we'll need a function that will handle swapping values between two places in our array:
+```javascript
+function swap(arr, i, j) {
+	let temp = arr[i];
+	arr[i] = arr[j];
+	arr[j] = temp;
+}
+```
+
+And next, let's put it to work alongside the logic for the sort! Most resources call this function "partition", and I'll continue with that convention.
+
+```javascript
+function partition(arr, start, end) {
+
+    // Approximate the median and move that value to the end of the array
+	let pivot, pivotIndex = getMedianOfThree(arr, start, end)
+    swap(arr, pivotIndex, end)
+
+	let i = start - 1;
+    // For each element until the pivot, beginning with [0]...
+	for (let j = start; j <= end - 1; j++) {
+
+		// If current element is smaller than pivot
+		if (arr[j] < pivot) {
+
+			// Increment index of counter i
+			i++;
+            // and swap the values at i and j
+			swap(arr, i, j);
+		}
+	}
+
+    // Swap the pivot value to the spot after i.
+	swap(arr, i + 1, high);
+    // Now all elements left of pivot are lesser,
+    // and all elements right of pivot are greater!
+
+	return i + 1; // the index of pivot.
+```
+
+And now, we may define the `quickSort` function that will run this process until complete:
+
+```javascript
+
+```
 
 
 

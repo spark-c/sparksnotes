@@ -76,3 +76,29 @@ document.write("Sorted array: <br>");
 printArray(arr, n);
 
 // This code is contributed by Saurabh Jaiswal
+
+
+
+
+
+
+
+function getMedianOfThree(arr, start, end) {
+	const medianIndex = Math.floor(arr.length / 2)
+	const medianArray = [
+		arr[start],
+		arr[medianIndex],
+		arr[end]
+	]
+
+	const target = medianArray.sort()[1]
+	// See which value was the median, and return that value and its index.
+	switch (target) {
+		case arr[start]:
+			return arr[start], start
+		case arr[medianIndex]:
+			return arr[medianIndex], medianIndex
+		case arr[end]:
+			return arr[end], end
+	}
+}
