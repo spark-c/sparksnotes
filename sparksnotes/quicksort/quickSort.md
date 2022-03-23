@@ -14,13 +14,22 @@ In general, these are the basic steps to the Quicksort algorithm:
 1. **Compare** each element to the Pivot.
 1. **Swap** elements depending on how they compare to the Pivot value.
     * All items less than the Pivot should end up behind it in the array, and all of those greater than it come after. The array should then have two sides, or "*partitions*", that are separated by the pivot element.
-1. **Repeat** the process on each of the partitions until the array is sorted.
+1. **Repeat** the process (recursively) on each of the partitions until the array is sorted.
 
 Take a look at the infographic below to get a sense for how the process flows:
 
 ![](Quicksort.png)
 > *This graphic was found within another nice Quicksort article [here](https://www.techiedelight.com/quicksort/)!*
 
+
+### A note:
+
+When we define functions for this algorithm, they should be taking three arguments:
+* `arr`: Our complete array of integers to be sorted.
+* `start`: The beginning index (inclusive) of the partition to sort.
+* `end`: The final index (inclusive) of the partition to sort.
+
+This is important! We are passing these indices each time, because our algorthim will be called recursively several times on several sections of our array. This allows us to work in-place in memory, instead of needing to create many new and/or temporary arrays in the process of the sort.
 
 ## 1. Choosing the Pivot
 
@@ -49,6 +58,22 @@ function getMedianOfThree(arr, start, end) {
 ```
 
 
-## 2. Comparing elements to the Pivot value
+## 2. Comparing elements to the Pivot value / Swapping
 
-Now we need use our pivot value to help arrange the remaining elements.
+Now we need use our pivot value as a reference to help arrange the remaining elements.
+
+[This video](https://www.youtube.com/watch?v=MZaf_9IZCrc) does a great job demonstrating the process visually, and I highly recommend watching!
+
+There will be a few steps to do this:
+
+1. Place the pivot element at the end of the array
+1. Create two counter variables, `i` and `j`, whose values will begin at `start - 1` and `start` respectively.
+1. Compare the value at `arr[j]` to the pivot value.
+    * If `arr[j]` is greater than pivot, simply increment `j` by 1, and begin again.
+    * Else, if `arr[j]` is less than pivot, then increment `i` by 1 *and **then*** swap the values found at `arr[j]` and `arr[i]`. Finally, increment `j` by 1. If `i === j`, don't worry; the element does not change and the process can move forward.
+1. When `j === end`, swap the pivot value (found at `arr[end]`) with the index `i + 1`. Now, all values before the pivot value should be lesser, and all values to the right of the pivot value should be greater. We've created a new partition on either side of the pivot!
+1. Then, call the quicksort function again on both partitions (not including the pivot, which is now already in its correct location):
+    ```javascript
+    quickSort(arr, start, pivotIndex - 1) // the left partition
+    quickSort(arr, pivotIndex + 1, end) // the right partition
+    ```
